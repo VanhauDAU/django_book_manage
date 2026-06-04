@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -7,14 +8,26 @@ from books.models import Book
 
 class BookAPITestCase(APITestCase):
     def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="book_user",
+            password="test_password",
+        )
+        self.client.force_authenticate(user=self.user)
         self.book = Book.objects.create(
             title="Clean Code",
             author="Robert C. Martin",
             published_date="2008-08-01",
         )
 
+    def test_book_list_requires_authentication(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(reverse("book-list"))
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_get_book_list(self):
-        response = self.client.get(reverse("book-list-create"))
+        response = self.client.get(reverse("book-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -27,7 +40,7 @@ class BookAPITestCase(APITestCase):
             "published_date": "2022-03-15",
         }
 
-        response = self.client.post(reverse("book-list-create"), payload, format="json")
+        response = self.client.post(reverse("book-list"), payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Book.objects.count(), 2)

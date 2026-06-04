@@ -1,10 +1,19 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 
 from books.models import Book
-from books.serializers import BookListSerializer
+from books.serializers import BookListSerializer, BookSerializer
 
 # Create your views here.
+
+
+class BookViewSet(ModelViewSet):
+    queryset = Book.objects.all().order_by("id")
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
 
 @csrf_exempt
 def home(request):
