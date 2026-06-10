@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from books.models import Book
+from books.pagination import BookPagination
 from books.serializers import BookListSerializer, BookSerializer
 
 # Create your views here.
@@ -13,6 +14,31 @@ class BookViewSet(ModelViewSet):
     queryset = Book.objects.all().order_by("id")
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = BookPagination
+
+    def get_queryset(self):
+        queryset = Book.objects.all().order_by("id")
+        return self.filter_books(queryset)
+
+    def filter_books(self, queryset):
+        title = self.request.query_params.get("title")
+        author = self.request.query_params.get("author")
+        price = self.request.query_params.get("price")
+        quantity = self.request.query_params.get("quantity")
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+
+        if author:
+            queryset = queryset.filter(author__icontains=author)
+
+        if price:
+            queryset = queryset.filter(price=price)
+
+        if quantity:
+            queryset = queryset.filter(quantity=quantity)
+
+        return queryset
 
 
 @csrf_exempt
