@@ -1,5 +1,7 @@
 # Book Manage
 
+[![CI](https://github.com/VanhauDAU/django_book_manage/actions/workflows/ci.yml/badge.svg)](https://github.com/VanhauDAU/django_book_manage/actions/workflows/ci.yml)
+
 Ứng dụng quản lý sách gồm Django REST API và React frontend.
 
 ## Cấu trúc dự án
