@@ -1,6 +1,22 @@
 # Book Manage
 
-Dự án Django `book_manage` là ứng dụng quản lý sách đơn giản.
+Ứng dụng quản lý sách gồm Django REST API và React frontend.
+
+## Cấu trúc dự án
+
+```text
+.
+├── backend/
+│   ├── book_manage/
+│   ├── books/
+│   ├── manage.py
+│   └── requirements.txt
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   └── package.json
+└── README.md
+```
 
 ## Tổng quan
 
@@ -16,18 +32,24 @@ Dự án Django `book_manage` là ứng dụng quản lý sách đơn giản.
 - PostgreSQL đang chạy ở máy local hoặc Docker
 - Database/user PostgreSQL đã được tạo
 
-## Cài đặt
+## Cài đặt backend
 
-1. Kích hoạt virtual environment:
+1. Kích hoạt virtual environment từ thư mục gốc:
 
 ```powershell
-cd .\book_manage
-.\venv\Scripts\Activate.ps1
+.\venv3\Scripts\Activate.ps1
 ```
 
-2. Cài đặt dependencies:
+Trên macOS/Linux:
 
-```powershell
+```bash
+source venv3/bin/activate
+```
+
+2. Di chuyển vào backend và cài đặt dependencies:
+
+```bash
+cd backend
 pip install -r requirements.txt
 ```
 
@@ -35,6 +57,12 @@ pip install -r requirements.txt
 
 ```powershell
 copy .env.example .env
+```
+
+Trên macOS/Linux:
+
+```bash
+cp .env.example .env
 ```
 
 Cập nhật thông tin PostgreSQL trong `.env`:
@@ -74,6 +102,20 @@ python manage.py createsuperuser
 ```powershell
 python manage.py runserver
 ```
+
+Backend chạy mặc định tại `http://localhost:8000`.
+
+## Cài đặt frontend
+
+Mở terminal khác từ thư mục gốc:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend chạy mặc định tại `http://localhost:5173`.
 
 ## API
 
