@@ -1,4 +1,4 @@
-export default function AppHeader({ onAddBook }) {
+export default function AppHeader({ onAddBook, onLogout }) {
   return (
     <header className="app-header">
       <div className="header-content">
@@ -9,13 +9,18 @@ export default function AppHeader({ onAddBook }) {
             <p className="brand-subtitle">Book Management System</p>
           </div>
         </div>
-        <button
-          id="add-book-btn"
-          className="btn btn-primary btn-add"
-          onClick={onAddBook}
-        >
-          <span>+</span> Add Book
-        </button>
+        <div className="header-actions">
+          <button
+            id="add-book-btn"
+            className="btn btn-primary btn-add"
+            onClick={onAddBook}
+          >
+            <span>+</span> Add Book
+          </button>
+          <button className="btn btn-secondary" onClick={onLogout}>
+            Logout
+          </button>
+        </div>
       </div>
     </header>
   );

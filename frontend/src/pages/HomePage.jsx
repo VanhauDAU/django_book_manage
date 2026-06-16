@@ -8,12 +8,15 @@ import Notifications from "../components/Notifications";
 import Pagination from "../components/Pagination";
 import useBookManagement from "../hooks/useBookManagement";
 
-export default function HomePage() {
+export default function HomePage({ onLogout }) {
   const bookManagement = useBookManagement();
 
   return (
     <div className="page-container">
-      <AppHeader onAddBook={() => bookManagement.setShowAddForm(true)} />
+      <AppHeader
+        onAddBook={() => bookManagement.setShowAddForm(true)}
+        onLogout={onLogout}
+      />
 
       <main className="main-content">
         <Notifications

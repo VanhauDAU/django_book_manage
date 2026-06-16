@@ -24,14 +24,33 @@ class BookAPITestCase(APITestCase):
 
         response = self.client.get(reverse("book-list"))
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_book_list(self):
         response = self.client.get(reverse("book-list"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["current_page"], 1)
+        self.assertEqual(response.data["page_size"], 20)
         self.assertEqual(response.data["results"][0]["title"], self.book.title)
+
+    def test_custom_pagination_accepts_page_size(self):
+        for index in range(25):
+            Book.objects.create(title=f"Book {index}", author="Author")
+
+        response = self.client.get(reverse("book-list"), {"page_size": 10})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["page_size"], 10)
+        self.assertEqual(response.data["total_pages"], 3)
+        self.assertEqual(len(response.data["results"]), 10)
+
+    def test_invalid_page_size_falls_back_to_default(self):
+        response = self.client.get(reverse("book-list"), {"page_size": "bad"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["page_size"], 20)
 
     def test_filter_books_by_title(self):
         Book.objects.create(title="Django for APIs", author="William S. Vincent")
@@ -101,3 +120,20 @@ class BookAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Book.objects.filter(pk=self.book.pk).exists())
+
+    def test_logout_blacklists_refresh_token(self):
+        token_response = self.client.post(
+            reverse("token_obtain_pair"),
+            {"username": "book_user", "password": "test_password"},
+            format="json",
+        )
+
+        self.assertEqual(token_response.status_code, status.HTTP_200_OK)
+
+        logout_response = self.client.post(
+            reverse("logout"),
+            {"refresh": token_response.data["refresh"]},
+            format="json",
+        )
+
+        self.assertEqual(logout_response.status_code, status.HTTP_205_RESET_CONTENT)

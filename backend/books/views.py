@@ -1,11 +1,13 @@
-from django.http import JsonResponse
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 from books.models import Book
 from books.pagination import BookPagination
@@ -13,7 +15,7 @@ from books.serializers import BookListSerializer, BookSerializer
 
 
 @api_view(["GET", "POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def book_list_create(request):
     if request.method == "GET":
         books = Book.objects.all().order_by("id")
@@ -46,7 +48,7 @@ def book_list_create(request):
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
@@ -68,6 +70,29 @@ def book_detail(request, pk):
 
     book.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    refresh_token = request.data.get("refresh")
+
+    if not refresh_token:
+        return Response(
+            {"detail": "Refresh token is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+    except TokenError:
+        return Response(
+            {"detail": "Invalid or expired refresh token."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(status=status.HTTP_205_RESET_CONTENT)
 
 
 @csrf_exempt

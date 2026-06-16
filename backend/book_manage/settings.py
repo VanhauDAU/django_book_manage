@@ -24,12 +24,15 @@ load_dotenv(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-id*3fvwwc9lqomq5f60i&^xh-i_m_2jegl-m*9*e6s2$&j1s&n'
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-id*3fvwwc9lqomq5f60i&^xh-i_m_2jegl-m*9*e6s2$&j1s&n",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if not DEBUG else []
 
 
 # Application definition
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'books'
 ]
@@ -149,7 +153,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'books.pagination.BookPagination',
     'PAGE_SIZE': 20,
     'PAGE_SIZE_QUERY_PARAM': 'page_size',
     'MAX_PAGE_SIZE': 100,

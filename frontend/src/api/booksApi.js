@@ -1,11 +1,4 @@
-import axios from "axios";
-
-const API_BASE = "http://localhost:8000/api";
-
-const api = axios.create({
-  baseURL: API_BASE,
-  headers: { "Content-Type": "application/json" },
-});
+import httpClient from "./httpClient";
 
 /**
  * Fetch paginated books with optional filters.
@@ -15,15 +8,15 @@ export const getBooks = (page = 1, pageSize = 20, title = "", author = "") => {
   const params = { page, page_size: pageSize };
   if (title) params.title = title;
   if (author) params.author = author;
-  return api.get("/books/", { params });
+  return httpClient.get("/books/", { params });
 };
 
-export const getBook = (id) => api.get(`/books/${id}/`);
+export const getBook = (id) => httpClient.get(`/books/${id}/`);
 
-export const createBook = (data) => api.post("/books/", data);
+export const createBook = (data) => httpClient.post("/books/", data);
 
-export const updateBook = (id, data) => api.put(`/books/${id}/`, data);
+export const updateBook = (id, data) => httpClient.put(`/books/${id}/`, data);
 
-export const patchBook = (id, data) => api.patch(`/books/${id}/`, data);
+export const patchBook = (id, data) => httpClient.patch(`/books/${id}/`, data);
 
-export const deleteBook = (id) => api.delete(`/books/${id}/`);
+export const deleteBook = (id) => httpClient.delete(`/books/${id}/`);
