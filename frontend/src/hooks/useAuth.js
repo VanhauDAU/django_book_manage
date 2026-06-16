@@ -21,9 +21,15 @@ export default function useAuth() {
       const response = await loginRequest(credentials);
       saveTokens(response.data);
       setIsAuthenticated(true);
-    } catch {
+    } catch (error) {
       clearTokens();
-      setAuthError("Invalid username or password.");
+      if (!error.response) {
+        setAuthError("Cannot connect to the backend server.");
+      } else if (error.response.status === 401) {
+        setAuthError("Invalid username or password.");
+      } else {
+        setAuthError("Login failed. Please try again.");
+      }
       setIsAuthenticated(false);
     } finally {
       setAuthLoading(false);
